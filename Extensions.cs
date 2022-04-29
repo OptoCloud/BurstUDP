@@ -21,10 +21,18 @@ namespace BurstUDP
         }
 
         public delegate Task AsyncTask<T>(T item);
-        public static Task ForEachAsync<T>(this IEnumerable<T> partitions, AsyncTask<T> func)
+
+        /// <summary>
+        /// Runs all items in the enumerable in parallel as tasks, and awaits them all to finish.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public static Task ForEachAsync<T>(this IEnumerable<T> source, AsyncTask<T> func)
         {
             // Start async funcs on all tasks at the same time (.ToArray() is really important, because it finishes all the iterations)
-            return Task.WhenAll(partitions.Select(p => func(p)).ToArray());
+            return Task.WhenAll(source.Select(p => func(p)).ToArray());
         }
     }
 }

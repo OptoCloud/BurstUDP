@@ -13,9 +13,11 @@ namespace BurstUDP
     {
         static readonly ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
 
+        /// <summary>
+        /// Contains a chunk read from the file, this will be hashed, have its header written, hashed, then having its hash written to it. then it will be sent to the client.
+        /// </summary>
         struct FileChunk
         {
-
             public FileChunk(Guid fileID, uint chunkId, byte[] data) : this()
             {
                 FileID = fileID;
@@ -28,6 +30,12 @@ namespace BurstUDP
             public byte[] Data;
         }
 
+        /// <summary>
+        /// Reads the file in chunks, and returns them as a lazy enumerable.
+        /// </summary>
+        /// <param name="fileID"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         static IEnumerable<FileChunk> ReadFileChunks(Guid fileID, string fileName)
         {
             ulong nChunks = 0;
@@ -59,6 +67,12 @@ namespace BurstUDP
         }
 
         static int taskNum = 0;
+
+        /// <summary>
+        /// Processes a enumerable of file chunks, and sends them to the client.
+        /// </summary>
+        /// <param name="fileChunks"></param>
+        /// <returns></returns>
         static async Task ProcessAndTransmit(IEnumerable<FileChunk> fileChunks)
         {
             Console.WriteLine($"Launched Task[{Interlocked.Increment(ref taskNum)}]");
